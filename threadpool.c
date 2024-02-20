@@ -349,30 +349,30 @@ void *process(void *arg)
 
 int main()
 {
-	threadpool_t *thp = threadpool_create(3,30,30);/*创建线程池，池里最小3个线程，最大100，队列最大100*/
-	printf("pool inited\n");
- 
-	int num[30], i;
-	for (i = 0; i < 30; i++) {
-		num[i] = i;
-		printf("add task %d\n",i);
-		threadpool_add(thp, process, (void*)&num[i]);     /* 向任务队列中添加任务 */
-	}
+    threadpool_t *thp = threadpool_create(3,30,30);/*创建线程池，池里最小3个线程，最大100，队列最大100*/
+    printf("pool inited\n");
 
-	while(true) {
-		pthread_mutex_lock(&(thp->thread_counter));
-		int busyNum = thp->busy_thr_num;
-		int taskNum = thp->queue_size;
-		pthread_mutex_unlock(&(thp->thread_counter));
+    int num[30], i;
+    for (i = 0; i < 30; i++) {
+        num[i] = i;
+        printf("add task %d\n",i);
+        threadpool_add(thp, process, (void*)&num[i]);     /* 向任务队列中添加任务 */
+    }
 
-		/* 释放线程池 */
-		if (busyNum == 0 && taskNum == 0) {	
-				printf("busyNum == 0 && taskNum == 0, clean up thread pool\n");
-				threadpool_destroy(thp);
-				return 0;
-		}
-	}	
+    while(true) {
+        pthread_mutex_lock(&(thp->thread_counter));
+        int busyNum = thp->busy_thr_num;
+        int taskNum = thp->queue_size;
+        pthread_mutex_unlock(&(thp->thread_counter));
 
-	printf("never go here\n");
+        /* 释放线程池 */
+        if (busyNum == 0 && taskNum == 0) {	
+                printf("busyNum == 0 && taskNum == 0, clean up thread pool\n");
+                threadpool_destroy(thp);
+                return 0;
+        }
+    }
+
+    printf("never go here\n");
 }
 /* gcc threadpool.c -o threadpool -lpthread */
